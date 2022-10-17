@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace Mod1.Items
+{
+    public class Bayonet : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            base.SetStaticDefaults();
+            DisplayName.SetDefault("Bayonet");
+        }
+
+        public override void SetDefaults()
+        {
+            item.damage = 12;
+            item.melee = true;
+            item.width = 32;
+            item.height = 32;
+            item.useTime = 12;
+            item.useAnimation = 12;
+            item.knockBack = 4;
+            item.value = 300;
+            item.rare = ItemRarityID.Green;
+            item.UseSound = SoundID.Item1;
+            item.autoReuse = true;
+            item.crit = 8;
+            item.useStyle = ItemUseStyleID.Stabbing;
+        }
+
+        public override void AddRecipes()
+        {
+            ModRecipe recipe = new ModRecipe(mod);
+            recipe.AddIngredient(ItemID.IronShortsword, 1);
+            recipe.AddIngredient(ItemID.Chain, 2);
+            recipe.AddTile(TileID.Anvils);
+            recipe.SetResult(this);
+            recipe.AddRecipe();
+        }
+    }
+}

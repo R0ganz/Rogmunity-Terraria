@@ -1,0 +1,116 @@
+using Microsoft.Xna.Framework;
+using System;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace Mod1.Projectiles.Minions
+{
+	public class PunkSlimeProjectile : ModProjectile
+	{
+		public override void SetStaticDefaults()
+		{
+			DisplayName.SetDefault("Punk Slime");
+			// Sets the amount of frames this minion has on its spritesheet
+			Main.projFrames[projectile.type] = 12;
+			// This is necessary for right-click targeting
+			ProjectileID.Sets.MinionTargettingFeature[projectile.type] = true;
+
+			// These below are needed for a minion
+			// Denotes that this projectile is a pet or minion
+			Main.projPet[projectile.type] = true;
+			// This is needed so your minion can properly spawn when summoned and replaced when other minions are summoned
+			ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
+			// Don't mistake this with "if this is true, then it will automatically home". It is just for damage reduction for certain NPCs
+			ProjectileID.Sets.Homing[projectile.type] = true;
+		}
+
+		public sealed override void SetDefaults()
+		{
+			projectile.width = 58;
+			Main.projFrames[projectile.type] = 12;
+			projectile.height = 38;
+			// Makes the minion go through tiles freely
+			projectile.tileCollide = false;
+
+			// These below are needed for a minion weapon
+			// Only controls if it deals damage to enemies on contact (more on that later)
+			projectile.friendly = true;
+			// Only determines the damage type
+			projectile.minion = true;
+			// Amount of slots this minion occupies from the total minion slots available to the player (more on that later)
+			projectile.minionSlots = .75f;
+			// Needed so the minion doesn't despawn on collision with enemies or tiles
+			projectile.penetrate = -1;
+			aiType = ProjectileID.BabySlime;
+			projectile.CloneDefaults(ProjectileID.BabySlime);
+			projectile.tileCollide = true;
+			projectile.netImportant = true;
+			projectile.alpha = 0;
+			drawOriginOffsetY = -16;
+		}
+
+		public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+			target.AddBuff(BuffID.Venom, 600);
+		}
+
+        // Here you can decide if your minion breaks things like grass or pots
+        public override bool? CanCutTiles()
+		{
+			return false;
+		}
+
+		// This is mandatory if your minion deals contact damage (further related stuff in AI() in the Movement region)
+		public override bool MinionContactDamage()
+		{
+			return true;
+		}
+
+		public override void AI()
+		{
+			Player player = Main.player[projectile.owner];
+
+			#region Active check
+			// This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
+			if (player.dead || !player.active)
+			{
+				player.ClearBuff(ModContent.BuffType<Buffs.PunkSlimeBuff>());
+			}
+			if (player.HasBuff(ModContent.BuffType<Buffs.PunkSlimeBuff>()))
+			{
+				projectile.timeLeft = 2;
+			}
+			#endregion
+
+
+			float distanceFromTarget = 700f;
+			Vector2 targetCenter = projectile.position;
+			bool foundTarget = false;
+
+			if (player.HasMinionAttackTargetNPC)
+			{
+				NPC npc = Main.npc[player.MinionAttackTargetNPC];
+				float between = Vector2.Distance(npc.Center, projectile.Center);
+				if (between < 2000f)
+				{
+					distanceFromTarget = between;
+					targetCenter = npc.Center;
+					foundTarget = true;
+				}
+			}
+			projectile.spriteDirection = -projectile.direction;
+			if (projectile.frameCounter > 30)
+			{
+				projectile.frame++;
+				projectile.frameCounter = 0;
+			}
+			if (projectile.frame > 11)
+			{
+				projectile.frame = 5;
+			}
+		}
+	}
+
+
+}

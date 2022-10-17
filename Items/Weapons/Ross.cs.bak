@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mod1.Tiles;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework;
+using Terraria;
+
+namespace Mod1.Items.Weapons
+{
+    class Ross : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Ross Rifle");
+            Tooltip.SetDefault("'Smells like maple syrup.'");
+        }
+
+        public override void SetDefaults()
+        {
+            item.damage = 25;
+            item.ranged = true;
+            item.width = 60;
+            item.height = 14;
+            item.useTime = 4;
+            item.useAnimation = 17;
+            item.useStyle = ItemUseStyleID.HoldingOut;
+            item.noMelee = true;
+            item.knockBack = 0;
+            item.value = 50000;
+            item.reuseDelay = 14;
+            item.rare = ItemRarityID.LightRed;
+            item.UseSound = mod.GetLegacySoundSlot(SoundType.Item, "Sounds/Item/RossBurst");
+            item.autoReuse = true;
+            item.shoot = 10;
+            item.shootSpeed = 30f;
+            item.useAmmo = AmmoID.Bullet;
+
+        }
+
+        public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
+        {
+            Vector2 muzzleOffset = Vector2.Normalize(new Vector2(speedX, speedY)) * 25f;
+            if (Collision.CanHit(position, 0, 0, position + muzzleOffset, 0, 0))
+            {
+                position += muzzleOffset;
+            }
+            return true;
+        }
+
+        public override void AddRecipes()
+        {
+            ModRecipe recipe = new ModRecipe(mod);
+            recipe.AddIngredient(ItemID.Musket);
+            recipe.AddIngredient(ItemID.RangerEmblem);
+            recipe.AddIngredient(ItemID.SoulofNight, 15);
+            recipe.AddTile(ModContent.TileType<GunsmithingTableTile>());
+            recipe.SetResult(this);
+            recipe.AddRecipe();
+        }
+
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-8, 0);
+        }
+
+        public override bool ConsumeAmmo(Player player)
+        {
+            return !(player.itemAnimation < item.useAnimation - 2);
+        }
+    }
+}

@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mod1.Tiles;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework;
+using Terraria;
+
+namespace Mod1.Items.Weapons
+{
+    class TrueMosin : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("True Mosin-Nagant");
+            Tooltip.SetDefault("'You're in the Bullets Way.'");
+        }
+
+        public override void SetDefaults()
+        {
+            Item.damage = 210;
+            Item.ranged = true;
+            Item.width = 64;
+            Item.height = 18;
+            Item.useTime = 26;
+            Item.useAnimation = 26;
+            Item.useStyle = ItemUseStyleID.Shoot;
+            Item.noMelee = true;
+            Item.knockBack = 8f;
+            Item.value = 50000;
+            Item.rare = ItemRarityID.LightRed;
+            Item.UseSound = SoundID.Item11;
+            Item.autoReuse = true;
+            Item.shoot = 10;
+            Item.shootSpeed = 28f;
+            Item.useAmmo = AmmoID.Bullet;
+            Item.crit = 75;
+
+        }
+
+        public override void AddRecipes()
+        {
+            Recipe recipe = new Recipe(Mod);
+            recipe.AddIngredient(ModContent.ItemType<Mosin>());
+            recipe.AddIngredient(ItemID.EyeoftheGolem);
+            recipe.AddIngredient(ItemID.HallowedBar, 20);
+            recipe.AddTile(ModContent.TileType<GunsmithingTableTile>());
+            recipe.SetResult(this);
+            recipe.Register();
+        }
+
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-8, 0);
+        }
+
+        public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
+        {
+            Vector2 muzzleOffset = Vector2.Normalize(new Vector2(speedX, speedY)) * 25f;
+            if (Collision.CanHit(position, 0, 0, position + muzzleOffset, 0, 0))
+            {
+                position += muzzleOffset;
+            }
+            return true;
+        }
+    
+    }
+}

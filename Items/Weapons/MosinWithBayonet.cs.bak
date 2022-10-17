@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mod1.Tiles;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework;
+using Terraria;
+
+namespace Mod1.Items.Weapons
+{
+    class MosinWithBayonet : ModItem
+    {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Mosin-Nagant with Bayonet");
+            Tooltip.SetDefault("The knife doubles it's value.");
+        }
+
+        public override void SetDefaults()
+        {
+            item.damage = 70;
+            item.ranged = true;
+            item.width = 72;
+            item.height = 16;
+            item.useTime = 30;
+            item.useAnimation = 30;
+            item.useStyle = ItemUseStyleID.HoldingOut;
+            item.knockBack = 5.25f;
+            item.value = 50000;
+            item.rare = ItemRarityID.LightRed;
+            item.autoReuse = true;
+            item.shootSpeed = 28f;
+            item.noMelee = true;
+            item.useAmmo = AmmoID.Bullet;
+        }
+
+        public override bool AltFunctionUse(Player player)
+        {
+            return true;
+        }
+
+        public override bool CanUseItem(Player player)
+        {
+            if (player.altFunctionUse == 2)
+            {
+                item.UseSound = SoundID.Item1;
+                item.melee = true;
+                item.useTime = 20;
+                item.useAnimation = 20;
+                item.damage = 50;
+                item.shoot = ModContent.ProjectileType<Projectiles.MosinProjectile>();
+                return player.ownedProjectileCounts[item.shoot] < 1;
+            }
+            else
+            {
+                item.damage = 70;
+                item.ranged = true;
+                item.useTime = 30;
+                item.useAnimation = 30;
+                item.knockBack = 5.25f;
+                item.UseSound = SoundID.Item11;
+                item.shoot = 10;
+            }
+            return base.CanUseItem(player);
+        }
+
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-8, 0);
+        }
+    }
+}
